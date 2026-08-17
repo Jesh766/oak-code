@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  city        String
+  services    String[]
+  budget      String
+  timeline    String
+  description String
+  source      String
+  fileUrl     String?
+  status      ContactStatus @default(NEW)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  category    String
+  description String
+  challenge   String
+  solution    String
+  results     String
+  techStack   String[]
+  imageUrl    String
+  mobileUrl   String?
+  demoUrl     String?
+  githubUrl   String?
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Testimonial {
+  id       String   @id @default(cuid())
+  name     String
+  role     String
+  city     String
+  avatar   String
+  rating   Int      @default(5)
+  content  String
+  featured Boolean  @default(true)
+  order    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String   @db.Text
+  category    String
+  author      String
+  authorAvatar String
+  readTime    Int
+  imageUrl    String
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PricingPlan {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  monthlyPrice Int
+  yearlyPrice  Int
+  features    String[]
+  popular     Boolean  @default(false)
+  cta         String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model AuditRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  website   String
+  status    AuditStatus @default(PENDING)
+  createdAt DateTime @default(now())
+}
+
+enum AuditStatus {
+  PENDING
+  COMPLETED
+  SENT
+}
+
+model SiteSettings {
+  id                    String   @id @default("default")
+  scarcityBannerEnabled Boolean  @default(true)
+  scarcitySpots         Int      @default(3)
+  countdownEndDate      DateTime
+  updatedAt             DateTime @updatedAt
+}
