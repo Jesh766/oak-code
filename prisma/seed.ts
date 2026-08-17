@@ -18,15 +18,7 @@ async function main() {
     },
   });
 
-  await prisma.siteSettings.upsert({
-    where: { id: 'default' },
-    update: { scarcityBannerEnabled: false },
-    create: {
-      id: 'default',
-      scarcityBannerEnabled: false,
-      scarcitySpots: 0,
-    },
-  });
+ 
 
   console.log('✅ Database seeded — admin user + safe defaults only, no placeholder content.');
   console.log('📧 Admin login: admin@oakandcode.in / ChangeThisPassword123!');
