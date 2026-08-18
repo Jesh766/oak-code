@@ -6,6 +6,7 @@ import SmoothScroll from '@/components/SmoothScroll';
 import CustomCursor from '@/components/ui/CustomCursor';
 import { siteConfig, faqSchema } from '@/lib/constants';
 import ChatWidget from '@/components/ChatWidget';
+import AnalyticsTracker from '@/components/analytics/AnalyticsTracker';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -48,7 +49,14 @@ export const metadata: Metadata = {
     title: 'Oak & Code — Web & App Development Agency',
     description: siteConfig.description,
     siteName: 'Oak & Code',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Oak & Code' }],
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Oak & Code',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -56,8 +64,13 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: ['/og-image.png'],
   },
-  robots: { index: true, follow: true },
-  alternates: { canonical: siteConfig.url },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: siteConfig.url,
+  },
 };
 
 const jsonLd = {
@@ -84,12 +97,16 @@ const jsonLd = {
       '@id': `${siteConfig.url}/#website`,
       url: siteConfig.url,
       name: 'Oak & Code',
-      publisher: { '@id': `${siteConfig.url}/#business` },
+      publisher: {
+        '@id': `${siteConfig.url}/#business`,
+      },
     },
     {
       '@type': 'Service',
       name: 'Web & App Development',
-      provider: { '@id': `${siteConfig.url}/#business` },
+      provider: {
+        '@id': `${siteConfig.url}/#business`,
+      },
       areaServed: 'India',
       description: 'Professional web and mobile app development services',
     },
@@ -98,26 +115,40 @@ const jsonLd = {
       mainEntity: faqSchema.map((faq) => ({
         '@type': 'Question',
         name: faq.question,
-        acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
       })),
     },
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrains.variable}`}>
+    <html
+      lang="en"
+      className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrains.variable}`}
+    >
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd),
+          }}
         />
+
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <script
               async
               src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
             />
+
             <script
               dangerouslySetInnerHTML={{
                 __html: `
@@ -131,12 +162,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </>
         )}
       </head>
+
       <body>
+        {/* Anonymous visitor analytics */}
+        <AnalyticsTracker />
+
         <div className="grain-overlay" />
+
         <SmoothScroll>
           <Providers>{children}</Providers>
         </SmoothScroll>
+
         <CustomCursor />
+
         <ChatWidget />
       </body>
     </html>

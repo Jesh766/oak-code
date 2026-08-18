@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Contact {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
   email       String
   phone       String
@@ -21,8 +21,8 @@ model Contact {
   source      String
   fileUrl     String?
   status      ContactStatus @default(NEW)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 enum ContactStatus {
@@ -52,48 +52,48 @@ model Project {
 }
 
 model Testimonial {
-  id       String   @id @default(cuid())
-  name     String
-  role     String
-  city     String
-  avatar   String
-  rating   Int      @default(5)
-  content  String
-  featured Boolean  @default(true)
-  order    Int      @default(0)
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  city      String
+  avatar    String
+  rating    Int      @default(5)
+  content   String
+  featured  Boolean  @default(true)
+  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model BlogPost {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  excerpt     String
-  content     String   @db.Text
-  category    String
-  author      String
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  excerpt      String
+  content      String   @db.Text
+  category     String
+  author       String
   authorAvatar String
-  readTime    Int
-  imageUrl    String
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  readTime     Int
+  imageUrl     String
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model PricingPlan {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String?
   monthlyPrice Int
   yearlyPrice  Int
-  features    String[]
-  popular     Boolean  @default(false)
-  cta         String
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  features     String[]
+  popular      Boolean  @default(false)
+  cta          String
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model AdminUser {
@@ -113,12 +113,12 @@ model NewsletterSubscriber {
 }
 
 model AuditRequest {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   name      String
   email     String
   website   String
   status    AuditStatus @default(PENDING)
-  createdAt DateTime @default(now())
+  createdAt DateTime    @default(now())
 }
 
 enum AuditStatus {
@@ -133,4 +133,74 @@ model SiteSettings {
   scarcitySpots         Int      @default(3)
   countdownEndDate      DateTime
   updatedAt             DateTime @updatedAt
+}
+
+model VisitorSession {
+  id        String @id @default(cuid())
+  sessionId String @unique
+  visitorId String
+
+  startedAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  endedAt    DateTime?
+
+  durationMs Int @default(0)
+  pageCount  Int @default(0)
+
+  entryPage String?
+  exitPage  String?
+
+  referrer    String?
+  landingPage String?
+
+  country String?
+  region  String?
+
+  deviceType String?
+  browser    String?
+  os         String?
+
+  pageViews PageView[]
+  events    AnalyticsEvent[]
+
+  @@index([visitorId])
+  @@index([startedAt])
+  @@index([lastSeenAt])
+}
+
+model PageView {
+  id String @id @default(cuid())
+
+  sessionId String
+  session   VisitorSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+
+  path  String
+  title String?
+
+  enteredAt  DateTime  @default(now())
+  leftAt     DateTime?
+  durationMs Int       @default(0)
+
+  referrer String?
+
+  @@index([sessionId])
+  @@index([path])
+  @@index([enteredAt])
+}
+
+model AnalyticsEvent {
+  id String @id @default(cuid())
+
+  sessionId String
+  session   VisitorSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+
+  name  String
+  path  String?
+  value String?
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([name])
+  @@index([createdAt])
 }
