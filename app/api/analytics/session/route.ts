@@ -16,9 +16,7 @@ function getDeviceType(userAgent: string): string {
     return 'tablet';
   }
 
-  if (
-    /mobile|android|iphone|ipod|blackberry|windows phone/.test(ua)
-  ) {
+  if (/mobile|android|iphone|ipod|blackberry|windows phone/.test(ua)) {
     return 'mobile';
   }
 
@@ -28,9 +26,9 @@ function getDeviceType(userAgent: string): string {
 function getBrowser(userAgent: string): string {
   if (/edg\//i.test(userAgent)) return 'Edge';
   if (/opr\//i.test(userAgent)) return 'Opera';
-  if (/chrome\//i.test(userAgent) && !/edg\//i.test(userAgent)) return 'Chrome';
+  if (/chrome\//i.test(userAgent)) return 'Chrome';
   if (/firefox\//i.test(userAgent)) return 'Firefox';
-  if (/safari\//i.test(userAgent) && !/chrome\//i.test(userAgent)) return 'Safari';
+  if (/safari\//i.test(userAgent)) return 'Safari';
 
   return 'Other';
 }
@@ -47,7 +45,37 @@ function getOS(userAgent: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as SessionRequest;
+    /*
+     * Read the body safely.
+     *
+     * request.json() throws an exception when the request body
+     * is empty. Reading text first lets us handle that properly.
+     */
+    const rawBody = await request.text();
+
+    if (!rawBody.trim()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Request body is empty',
+        },
+        { status: 400 }
+      );
+    }
+
+    let body: SessionRequest;
+
+    try {
+      body = JSON.parse(rawBody) as SessionRequest;
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid JSON body',
+        },
+        { status: 400 }
+      );
+    }
 
     const sessionId = body.sessionId?.trim();
     const visitorId = body.visitorId?.trim();
@@ -63,7 +91,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Keep IDs within reasonable limits.
     if (sessionId.length > 100 || visitorId.length > 100) {
       return NextResponse.json(
         {
@@ -74,7 +101,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (path.length > 500) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid path',
+        },
+        { status: 400 }
+      );
+    }
+
     const userAgent = request.headers.get('user-agent') || '';
+
     const referrer =
       body.referrer?.trim() ||
       request.headers.get('referer') ||
@@ -84,35 +122,21 @@ export async function POST(request: NextRequest) {
     const browser = getBrowser(userAgent);
     const os = getOS(userAgent);
 
-    const existingSession = await prisma.visitorSession.findUnique({
+    /*
+     * Upsert keeps the endpoint safe when multiple requests
+     * arrive at almost the same time.
+     */
+    const session = await prisma.visitorSession.upsert({
       where: {
         sessionId,
       },
-    });
 
-    if (existingSession) {
-      const updatedSession = await prisma.visitorSession.update({
-        where: {
-          sessionId,
-        },
-        data: {
-          lastSeenAt: new Date(),
-          exitPage: path,
-        },
-      });
+      update: {
+        lastSeenAt: new Date(),
+        exitPage: path,
+      },
 
-      return NextResponse.json({
-        success: true,
-        session: {
-          id: updatedSession.id,
-          sessionId: updatedSession.sessionId,
-          visitorId: updatedSession.visitorId,
-        },
-      });
-    }
-
-    const session = await prisma.visitorSession.create({
-      data: {
+      create: {
         sessionId,
         visitorId,
 

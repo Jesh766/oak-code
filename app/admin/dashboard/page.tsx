@@ -13,6 +13,7 @@ import {
   LogOut,
   BookOpen,
   Star,
+  LineChart,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
@@ -67,38 +68,43 @@ export default function AdminDashboard() {
     { label: 'Subscribers', value: stats?.totalSubscribers || 0, icon: Mail, color: 'text-blue-400' },
   ];
 
-const navItems = [
-  {
-    href: '/admin/dashboard',
-    label: 'Dashboard',
-    icon: Users,
-  },
-  {
-    href: '/admin/contacts',
-    label: 'Contacts',
-    icon: MessageSquare,
-  },
-  {
-    href: '/admin/projects',
-    label: 'Projects',
-    icon: FolderOpen,
-  },
-  {
-    href: '/admin/testimonials',
-    label: 'Testimonials',
-    icon: Star,
-  },
-  {
-    href: '/admin/blog',
-    label: 'Blog',
-    icon: BookOpen,
-  },
-  {
-    href: '/admin/settings',
-    label: 'Settings',
-    icon: Settings,
-  },
-];
+  const navItems = [
+    {
+      href: '/admin/dashboard',
+      label: 'Dashboard',
+      icon: Users,
+    },
+    {
+      href: '/admin/contacts',
+      label: 'Contacts',
+      icon: MessageSquare,
+    },
+    {
+      href: '/admin/projects',
+      label: 'Projects',
+      icon: FolderOpen,
+    },
+    {
+      href: '/admin/testimonials',
+      label: 'Testimonials',
+      icon: Star,
+    },
+    {
+      href: '/admin/blog',
+      label: 'Blog',
+      icon: BookOpen,
+    },
+    {
+      href: '/admin/analytics',
+      label: 'Analytics',
+      icon: LineChart,
+    },
+    {
+      href: '/admin/settings',
+      label: 'Settings',
+      icon: Settings,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-primary-dark flex">

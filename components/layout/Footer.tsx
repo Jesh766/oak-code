@@ -55,13 +55,35 @@ export default function Footer() {
               </a>
 
               {/* Phone */}
-              <a
-                href={`tel:${siteConfig.phone}`}
-                className="flex items-center gap-2 hover:text-gold transition-colors"
-              >
-                <Phone className="w-4 h-4" />
-                {siteConfig.phone}
-              </a>
+            <a
+  href={`tel:${siteConfig.phone}`}
+  onClick={() => {
+    const sessionId = localStorage.getItem('oak_session_id');
+
+    if (sessionId) {
+      fetch('/api/analytics/event', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          name: 'phone_click',
+          path: window.location.pathname,
+        }),
+      }).catch((error) => {
+        console.error(
+          '[Analytics] Failed to track phone click:',
+          error
+        );
+      });
+    }
+  }}
+  className="flex items-center gap-2 hover:text-gold transition-colors"
+>
+  <Phone className="w-4 h-4" />
+  {siteConfig.phone}
+</a>
 
               {/* Address */}
               <span className="flex items-center gap-2">
@@ -133,15 +155,37 @@ export default function Footer() {
             ))}
 
             {/* WhatsApp */}
-            <a
-              href={siteConfig.social.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="WhatsApp"
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#25D366]/20 text-[#25D366] hover:bg-[#25D366]/30 transition-all"
-            >
-              <FaWhatsapp className="w-4 h-4" />
-            </a>
+          <a
+  href={siteConfig.social.whatsapp}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="WhatsApp"
+  onClick={() => {
+    const sessionId = localStorage.getItem('oak_session_id');
+
+    if (sessionId) {
+      fetch('/api/analytics/event', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          name: 'whatsapp_click',
+          path: window.location.pathname,
+        }),
+      }).catch((error) => {
+        console.error(
+          '[Analytics] Failed to track WhatsApp click:',
+          error
+        );
+      });
+    }
+  }}
+  className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#25D366]/20 text-[#25D366] hover:bg-[#25D366]/30 transition-all"
+>
+  <FaWhatsapp className="w-4 h-4" />
+</a>
 
           </div>
 

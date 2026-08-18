@@ -11,8 +11,7 @@ export const siteConfig = {
   social: {
     instagram: '[YOUR INSTAGRAM URL OR DELETE THIS LINE]',
     linkedin: '[YOUR LINKEDIN URL OR DELETE THIS LINE]',
-    whatsapp: '[YOUR WHATSAPP LINK OR DELETE THIS LINE]',
-  },
+whatsapp: 'https://wa.me/919173389217',  },
 };
 
 export const services = [

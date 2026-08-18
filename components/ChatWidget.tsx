@@ -60,7 +60,31 @@ export default function ChatWidget() {
   return (
     <>
       <motion.button
-        onClick={() => setOpen(!open)}
+  onClick={() => {
+    const willOpen = !open;
+
+    setOpen(willOpen);
+
+    if (willOpen) {
+      const sessionId = localStorage.getItem('oak_session_id');
+
+      if (sessionId) {
+        fetch('/api/analytics/event', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sessionId,
+            name: 'chat_open',
+            path: window.location.pathname,
+          }),
+        }).catch((error) => {
+          console.error('[Analytics] Failed to track chat open:', error);
+        });
+      }
+    }
+  }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full bg-gold text-primary-dark flex items-center justify-center shadow-gold-lg"

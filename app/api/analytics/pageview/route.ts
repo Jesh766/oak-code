@@ -6,6 +6,10 @@ interface PageViewRequest {
   path?: string;
   title?: string;
   referrer?: string;
+}
+
+interface PageDurationRequest {
+  pageViewId?: string;
   durationMs?: number;
 }
 
@@ -83,6 +87,7 @@ export async function POST(request: NextRequest) {
         id: pageView.id,
         path: pageView.path,
         enteredAt: pageView.enteredAt,
+        durationMs: pageView.durationMs,
       },
     });
   } catch (error) {
@@ -92,6 +97,93 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: 'Unable to record page view',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = (await request.json()) as PageDurationRequest;
+
+    const pageViewId = body.pageViewId?.trim();
+
+    const durationMs =
+      typeof body.durationMs === 'number' &&
+      Number.isFinite(body.durationMs)
+        ? Math.max(
+            0,
+            Math.min(
+              Math.round(body.durationMs),
+              24 * 60 * 60 * 1000
+            )
+          )
+        : 0;
+
+    if (!pageViewId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'pageViewId is required',
+        },
+        { status: 400 }
+      );
+    }
+
+    const pageView = await prisma.pageView.findUnique({
+      where: {
+        id: pageViewId,
+      },
+    });
+
+    if (!pageView) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Page view not found',
+        },
+        { status: 404 }
+      );
+    }
+
+    const updatedPageView = await prisma.pageView.update({
+      where: {
+        id: pageViewId,
+      },
+      data: {
+        durationMs,
+        leftAt: new Date(),
+      },
+    });
+
+    await prisma.visitorSession.update({
+      where: {
+        sessionId: pageView.sessionId,
+      },
+      data: {
+        lastSeenAt: new Date(),
+        durationMs: {
+          increment: durationMs,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      pageView: {
+        id: updatedPageView.id,
+        durationMs: updatedPageView.durationMs,
+        leftAt: updatedPageView.leftAt,
+      },
+    });
+  } catch (error) {
+    console.error('Analytics page duration error:', error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Unable to update page duration',
       },
       { status: 500 }
     );

@@ -1,16 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check, X } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { whyUsPoints } from '@/lib/constants';
 
-const comparison = [
-  { feature: 'Delivery Time', us: '7–21 days', them: '2–6 months' },
-  { feature: 'Pricing', us: 'Fixed, transparent', them: 'Hidden costs' },
-  { feature: 'Support', us: '1 year free', them: 'Paid add-on' },
-  { feature: 'Project Manager', us: 'Dedicated', them: 'Shared/None' },
-  { feature: 'SEO Included', us: 'Yes, day one', them: 'Extra charge' },
-  { feature: 'Money Back', us: '100% guarantee', them: 'No guarantee' },
+const included = [
+  'A fixed price, agreed before any work starts',
+  'Direct contact with the person actually building your site',
+  'Real cross-device testing before launch',
+  'Support after launch, on agreed terms',
 ];
 
 export default function WhyUs() {
@@ -26,7 +24,7 @@ export default function WhyUs() {
           >
             <span className="badge-gold mb-4">Why Choose Us</span>
             <h2 className="heading-lg text-white mb-6">
-              Why 200+ Businesses Choose Oak & Code Over Others
+              Why local businesses work with us directly
             </h2>
             <ul className="space-y-4">
               {whyUsPoints.map((point, i) => (
@@ -52,33 +50,19 @@ export default function WhyUs() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="bg-primary-dark border border-gold/20 rounded-2xl overflow-hidden"
+            className="bg-primary-dark border border-gold/20 rounded-2xl overflow-hidden p-8"
           >
-            <div className="grid grid-cols-3 bg-forest/50 border-b border-gold/10">
-              <div className="p-4 text-sm font-semibold text-cream/60">Feature</div>
-              <div className="p-4 text-sm font-semibold text-gold text-center border-x border-gold/10">
-                Oak & Code
-              </div>
-              <div className="p-4 text-sm font-semibold text-cream/40 text-center">
-                Other Agencies
-              </div>
-            </div>
-            {comparison.map((row, i) => (
-              <div
-                key={row.feature}
-                className={`grid grid-cols-3 ${i % 2 === 0 ? 'bg-forest/20' : ''}`}
-              >
-                <div className="p-4 text-sm text-cream/70">{row.feature}</div>
-                <div className="p-4 text-sm text-gold font-medium text-center border-x border-gold/10 flex items-center justify-center gap-1">
-                  <Check className="w-4 h-4 flex-shrink-0" />
-                  {row.us}
-                </div>
-                <div className="p-4 text-sm text-cream/40 text-center flex items-center justify-center gap-1">
-                  <X className="w-4 h-4 flex-shrink-0 text-red-400/60" />
-                  {row.them}
-                </div>
-              </div>
-            ))}
+            <p className="font-mono text-xs tracking-[0.2em] text-gold uppercase mb-6">
+              What's included
+            </p>
+            <ul className="space-y-5">
+              {included.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
+                  <span className="text-cream/80">{item}</span>
+                </li>
+              ))}
+            </ul>
           </motion.div>
         </div>
       </div>
